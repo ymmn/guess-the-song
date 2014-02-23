@@ -1,0 +1,72 @@
+<!DOCTYPE HTML5>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>We can change the name later doesn't really matter</title>
+		<!--<link rel="stylesheet" type="text/css" href="style.css" />
+		<script src="game.js"></script>-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="https://raw.github.com/mudcube/MIDI.js/master/build/MIDI.min.js"></script>
+        <script type="text/javascript">
+        	var channel = 0; // whether overlap or not in playing notes
+        	var vel = 127; // 
+
+	        window.onload = function () {
+				MIDI.loadPlugin({
+					soundfontUrl: "./soundfont/",
+					instrument: "acoustic_grand_piano",
+					callback: function() {
+						MIDI.setVolume(0, 127);
+					}
+				});
+			};
+
+			// approximates note to closest note and octave (linearly rounds to nearest half note, not exponentially)
+			function freqToNote(freq) {
+				var octave = 4;
+				while (freq < 261.63) {
+					freq *= 2;
+					octave--;
+				}
+				while (freq > 523.25) {
+					freq /= 2;
+					octave++;
+				}
+				var note;
+				if (freq < 269.409) note = "C";
+				else if (freq < 285.42) note = "Db";
+				else if (freq < 302.395) note = "D";
+				else if (freq < 320.38) note = "Eb";
+				else if (freq < 339.43) note = "E";
+				else if (freq < 359.61) note = "F";
+				else if (freq < 380.995) note = "Gb";
+				else if (freq < 403.65) note = "G";
+				else if (freq < 427.65) note = "Ab";
+				else if (freq < 453.08) note = "A";
+				else if (freq < 480.02) note = "Bb";
+				else if (freq < 508.565) note = "B";
+				else {
+					note == "C";
+					octave++;
+				}
+				return note + octave;
+			}
+
+			// note either flat or natural, followed by octave (A0, Bb0, ... , C8)
+			// or frequency as a number (DOES NOT TAKE noteToKey vals)
+	        function playNote2(note) {
+	        	if (typeof(note) === "number") {
+	        		note = freqToNote(note);
+	        	}
+	        	MIDI.noteOn(channel, MIDI.keyToNote[note], vel, 0);
+	        	MIDI.noteOff(channel, MIDI.keyToNote[note], 0.75);
+	        }
+        </script>
+	</head>
+	<body>
+		<button onclick="start()">Play</button>
+		<button onclick="stop()">Stop</button><br />
+		<input type="range" min="-44" max="44" value="0" step="1" /><br />
+		<input type="text" name="note" size="3" /><input type="text" name="octave" size="3" />
+	</body>
+</html>
